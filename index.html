@@ -3,184 +3,303 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Portfolio</title>
+    <title>Edgar Zamora | Portfolio</title>
     <style>
-        /* CSS: Visual Styling */
+        /* --- CORE VARIABLES --- */
         :root {
-            --bg-color: #0d1117; /* GitHub Dark Dimmed */
-            --card-bg: #161b22;
-            --text-main: #c9d1d9;
-            --accent: #58a6ff; /* GitHub Blue */
-            --border: #30363d;
+            --bg-color: #0f0f12;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --accent-primary: #6366f1; /* Indigo */
+            --accent-secondary: #a855f7; /* Purple */
+            --card-bg: rgba(30, 41, 59, 0.7); /* Glass effect */
+            --border: rgba(255, 255, 255, 0.1);
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            margin: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-main);
-            margin: 0;
-            line-height: 1.6;
+            overflow-x: hidden; /* Prevent horizontal scroll from animations */
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(168, 85, 247, 0.15) 0%, transparent 20%);
+            background-attachment: fixed;
         }
 
-        header {
-            text-align: center;
-            padding: 4rem 1rem;
-            border-bottom: 1px solid var(--border);
+        /* --- TYPOGRAPHY --- */
+        h1, h2, h3 { margin: 0; font-weight: 700; letter-spacing: -0.5px; }
+        p { line-height: 1.7; color: var(--text-muted); }
+        a { text-decoration: none; color: inherit; transition: color 0.3s; }
+
+        /* --- LAYOUT UTILITIES --- */
+        .container { max-width: 1000px; margin: 0 auto; padding: 0 2rem; }
+        
+        /* Animation: Start hidden, slide up when visible */
+        section { opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out; margin: 8rem 0; }
+        section.visible { opacity: 1; transform: translateY(0); }
+
+        /* --- HERO SECTION --- */
+        .hero {
+            height: 90vh; /* Takes up most of the screen */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
         }
 
-        h1 { margin: 0; font-size: 2.5rem; }
-        .subtitle { color: #8b949e; font-size: 1.2rem; margin-top: 0.5rem; }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 2rem 1rem;
+        .hero h1 {
+            font-size: 4.5rem;
+            background: linear-gradient(to right, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
         }
 
-        /* About Section */
-        .about {
+        .hero .subtitle {
+            font-size: 1.8rem;
+            font-family: monospace;
+            color: var(--accent-primary);
+        }
+        
+        .cursor {
+            display: inline-block;
+            width: 10px;
+            background-color: var(--accent-primary);
+            animation: blink 1s infinite;
+        }
+
+        /* --- CARDS (Glassmorphism) --- */
+        .card {
             background: var(--card-bg);
-            padding: 2rem;
-            border-radius: 8px;
+            backdrop-filter: blur(10px);
             border: 1px solid var(--border);
-            margin-bottom: 3rem;
+            border-radius: 16px;
+            padding: 2rem;
+            transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
         }
 
-        /* Project Grid */
-        .projects-grid {
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-primary);
+            box-shadow: 0 10px 30px -10px rgba(99, 102, 241, 0.3);
+        }
+
+        /* --- PROJECTS GRID --- */
+        .grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
+            gap: 2rem;
         }
 
-        .project-card {
-            background: var(--card-bg);
-            padding: 1.5rem;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            transition: transform 0.2s;
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
         }
 
-        .project-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--accent);
-        }
+        .folder-icon { font-size: 2rem; color: var(--accent-primary); }
+        
+        .project-links a:hover { color: var(--accent-primary); }
 
-        .project-title {
-            color: var(--accent);
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 1.2rem;
-            display: block;
-            margin-bottom: 0.5rem;
-        }
+        .tags { display: flex; gap: 10px; margin-top: 1.5rem; font-size: 0.8rem; }
+        .tag { color: var(--accent-secondary); font-family: monospace; }
 
-        .tag {
+        /* --- BUTTONS --- */
+        .btn-play {
             display: inline-block;
-            background: #238636;
-            color: white;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            margin-right: 5px;
-        }
-
-        footer {
-            text-align: center;
-            padding: 2rem;
-            color: #8b949e;
+            margin-top: 1rem;
+            padding: 8px 16px;
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--accent-primary);
+            border-radius: 6px;
+            font-weight: bold;
             font-size: 0.9rem;
+            transition: background 0.3s;
+        }
+        .btn-play:hover { background: rgba(99, 102, 241, 0.2); }
+
+        footer { text-align: center; padding: 4rem 0; color: var(--text-muted); font-size: 0.9rem; }
+
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        
+        /* Mobile adjustment */
+        @media (max-width: 600px) {
+            .hero h1 { font-size: 3rem; }
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>Edgar Zamora</h1>
-        <div class="subtitle">Student & Developer</div>
-    </header>
-
     <div class="container">
-        <section class="about">
-            <h2>About Me</h2>
-            <p>
-                Hello! I am currently a student at <strong>UCSD</strong>. 
-                I enjoy working with technology, whether it's solving complex logic problems or troubleshooting hardware.
-            </p>
-            <p>
-                When I'm not studying, I enjoy PC gaming (mostly Minecraft) and working on personal tech projects.
+        
+        <section class="hero visible">
+            <p style="color: var(--accent-secondary); font-weight: bold; margin-bottom: 10px;">Hi, my name is</p>
+            <h1>Edgar Zamora.</h1>
+            <div class="subtitle">I am a <span id="typing-text"></span><span class="cursor">&nbsp;</span></div>
+            <p style="max-width: 500px; margin-top: 2rem;">
+                I am a student at UCSD specializing in software development. 
+                I enjoy working with technology, whether it's solving complex logic problems, 
+                troubleshooting hardware, or building game simulations.
             </p>
         </section>
 
-        <h2>My Projects</h2>
-        <div class="projects-grid">
+        <section id="about">
+            <h2 style="margin-bottom: 2rem; display: flex; align-items: center;">
+                <span style="color: var(--accent-primary); margin-right: 10px;">01.</span> About Me
+            </h2>
+            <div class="card">
+                <p>
+                    Hello! I am currently a student at <strong>UCSD</strong>. 
+                    I enjoy working with technology, whether it's solving complex logic problems or troubleshooting hardware.
+                </p>
+                <p>
+                    When I'm not studying, I enjoy PC gaming (mostly Minecraft) and working on personal tech projects.
+                    Recently, I've been focusing on building simulation engines in Java and Python.
+                </p>
+            </div>
+        </section>
+
+        <section id="projects">
+            <h2 style="margin-bottom: 2rem; display: flex; align-items: center;">
+                <span style="color: var(--accent-primary); margin-right: 10px;">02.</span> Projects
+            </h2>
             
-            <div class="project-card">
-                <span class="project-title">Rock Paper Scissors</span>
-                <p>
-                    A classic game implemented in two ways: a Java console app and a playable web version.
-                </p>
+            <div class="grid">
                 
-                <a href="rps.html" style="text-decoration:none;">
-                    <button style="background:#238636; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">
-                        ▶ Play Game
-                    </button>
-                </a>
-
-                <a href="https://github.com/Zamora-Edgar/RPS" style="margin-left: 10px; color: #58a6ff; text-decoration: none;">
-                    View Java Code &rarr;
-                </a>
-                
-                <div style="margin-top: 10px;">
-                    <span class="tag">Java</span> <span class="tag">JavaScript</span>
+                <div class="card">
+                    <div class="project-header">
+                        <div class="folder-icon">♠️</div>
+                        <div class="project-links">
+                            <a href="https://github.com/Zamora-Edgar" target="_blank">GitHub ↗</a>
+                        </div>
+                    </div>
+                    <h3>Texas Hold'em Bot</h3>
+                    <p>
+                        A complex 2-8 player poker simulation. Features an intelligent betting AI, 
+                        circular table UI rendering using trigonometry, and a 7-card hand evaluation engine.
+                    </p>
+                    <a href="texas.html" class="btn-play">▶ Play Simulation</a>
+                    <div class="tags">
+                        <span class="tag">JavaScript</span>
+                        <span class="tag">AI Logic</span>
+                    </div>
                 </div>
-            </div>
 
-            <div class="project-card">
-                <span class="project-title">Blackjack Simulator</span>
-                <p>
-                    A statistics engine that models card probabilities. 
-                    Includes a playable interface and a "Monte Carlo" simulation that runs 10,000 hands instantly.
-                </p>
-                
-                <a href="blackjack.html" style="text-decoration:none;">
-                    <button style="background:#238636; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">
-                        ▶ Play / Run Sim
-                    </button>
-                </a>
-
-                <a href="https://github.com/Zamora-Edgar/BlackJack-Sim-Java" style="margin-left: 10px; color: #58a6ff; text-decoration: none;">
-                    View Java Code &rarr;
-                </a>
-                
-                <div style="margin-top: 10px;">
-                    <span class="tag">Java</span> <span class="tag">JavaScript</span> <span class="tag">Stats</span>
+                <div class="card">
+                    <div class="project-header">
+                        <div class="folder-icon">🃏</div>
+                        <div class="project-links">
+                            <a href="https://github.com/Zamora-Edgar" target="_blank">GitHub ↗</a>
+                        </div>
+                    </div>
+                    <h3>Poker Hand Evaluator</h3>
+                    <p>
+                        A 5-card draw engine that uses frequency maps and sorting algorithms to 
+                        identify winning poker hands (Royal Flush, Full House) in O(n) time.
+                    </p>
+                    <a href="poker.html" class="btn-play">▶ Play Game</a>
+                    <div class="tags">
+                        <span class="tag">Java</span>
+                        <span class="tag">Algorithms</span>
+                    </div>
                 </div>
-            </div>
 
-           <div class="project-card">
-                <a href="poker.html" class="project-title">
-                    Texas Hold'em (Multi-Bot)
-                </a>
-                <p>
-                    A 2-8 player table simulator. Implements circular UI rendering using trigonometry and complex 7-card hand evaluation logic.
-                </p>
-                <a href="poker.html" style="text-decoration:none;">
-                    <button style="background:#238636; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">
-                        ▶ Open Table
-                    </button>
-                </a>
-                <div style="margin-top: 10px;">
-                    <span class="tag">Simulation</span> <span class="tag">Algorithms</span>
+                <div class="card">
+                    <div class="project-header">
+                        <div class="folder-icon">⚡</div>
+                        <div class="project-links">
+                            <a href="https://github.com/Zamora-Edgar/BlackJack-Sim-Java" target="_blank">GitHub ↗</a>
+                        </div>
+                    </div>
+                    <h3>Blackjack Simulator</h3>
+                    <p>
+                        A statistics engine that models card probabilities. 
+                        Includes a playable interface and a "Monte Carlo" simulation that runs 10,000 hands instantly.
+                    </p>
+                    <a href="blackjack.html" class="btn-play">▶ Play / Run Sim</a>
+                    <div class="tags">
+                        <span class="tag">Java</span>
+                        <span class="tag">Stats</span>
+                    </div>
                 </div>
-            </div>
 
-        </div>
+                <div class="card">
+                    <div class="project-header">
+                        <div class="folder-icon">🎮</div>
+                        <div class="project-links">
+                            <a href="https://github.com/Zamora-Edgar/RPS" target="_blank">GitHub ↗</a>
+                        </div>
+                    </div>
+                    <h3>Rock Paper Scissors</h3>
+                    <p>
+                        A classic game implemented in two ways: a Java console app and a playable web version.
+                        demonstrates game state loops and input validation.
+                    </p>
+                    <a href="rps.html" class="btn-play">▶ Play Game</a>
+                    <div class="tags">
+                        <span class="tag">Java</span>
+                        <span class="tag">Web</span>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
     </div>
 
     <footer>
-        <p>&copy; 2026. Built with HTML & CSS.</p>
+        <p>&copy; 2026 Edgar Zamora. Built with HTML & CSS.</p>
     </footer>
+
+    <script>
+        // 1. TYPING ANIMATION
+        const textElement = document.getElementById('typing-text');
+        const phrases = ["Student.", "Developer.", "Problem Solver.", "Gamer."];
+        let phraseIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+
+        function typeEffect() {
+            const currentPhrase = phrases[phraseIndex];
+            
+            if (isDeleting) {
+                textElement.innerText = currentPhrase.substring(0, charIndex--);
+            } else {
+                textElement.innerText = currentPhrase.substring(0, charIndex++);
+            }
+
+            let typeSpeed = isDeleting ? 50 : 100;
+
+            if (!isDeleting && charIndex === currentPhrase.length) {
+                typeSpeed = 2000; // Pause at end of phrase
+                isDeleting = true;
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                phraseIndex = (phraseIndex + 1) % phrases.length;
+                typeSpeed = 500;
+            }
+
+            setTimeout(typeEffect, typeSpeed);
+        }
+        
+        typeEffect();
+
+        // 2. SCROLL REVEAL ANIMATION
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('section').forEach(section => {
+            observer.observe(section);
+        });
+    </script>
 
 </body>
 </html>
