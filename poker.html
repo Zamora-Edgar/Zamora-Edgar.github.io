@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Video Poker</title>
+    <style>
+        body {
+            background-color: #0d1117;
+            color: #c9d1d9;
+            font-family: sans-serif;
+            text-align: center;
+            padding-top: 30px;
+        }
+
+        .game-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #161b22;
+            padding: 2rem;
+            border-radius: 10px;
+            border: 1px solid #30363d;
+        }
+
+        .cards-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            background: white;
+            color: black;
+            width: 80px;
+            height: 120px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            border: 3px solid transparent;
+            position: relative;
+        }
+
+        .card.held { border-color: #e3b341; box-shadow: 0 0 10px #e3b341; }
+        .red { color: #d73a49; }
+        .black { color: #24292e; }
+
+        .hold-label {
+            position: absolute;
+            top: -25px;
+            background: #e3b341;
+            color: black;
+            font-size: 0.8rem;
+            padding: 2px 5px;
+            border-radius: 4px;
+            display: none;
+        }
+        .card.held .hold-label { display: block; }
+
+        .btn {
+            background-color: #238636;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .btn:disabled { background-color: #30363d; cursor: not-allowed; }
+
+        .result { font-size: 2rem; color: #58a6ff; margin: 20px 0; min-height: 40px;}
+        .back-link { display: block; margin-top: 30px; color: #58a6ff; text-decoration: none; }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <h1>Five Card Draw</h1>
+        <p>Click cards to <strong>HOLD</strong>, then draw new ones.</p>
+        
+        <div class="cards-container" id="cards-area">
+            </div>
+
+        <div id="result-text" class="result"></div>
+        
+        <button id="action-btn" class="btn" onclick="handleAction()">Deal Hand</button>
+
+        <a href="index.html" class="back-link">← Back to Portfolio</a>
+    </div>
+
+    <script>
+        const suits = ['♥', '♦', '♣', '♠'];
+        const values = [2,3,4,5,6,7,8,9,10,11,12,13,14];
+        const ranks = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
+        
+        let deck = [];
+        let hand = [];
+        let stage = 'deal'; // 'deal' or 'draw'
+
+        function createDeck() {
+            deck = [];
+            for (let s of suits) {
+                for (let i = 0; i < values.length; i++) {
+                    deck.push({ suit: s, val: values[i], rank: ranks[i], held: false });
+                }
+            }
+            deck.sort(() => Math.random() - 0.5);
+        }
+
+        function render() {
+            const container = document.getElementById('cards-area');
+            container.innerHTML = '';
+            hand.forEach((card, index) => {
+                const div = document.createElement('div');
+                div.className = `card ${['♥','♦'].includes(card.suit) ? 'red' : 'black'} ${card.held ? 'held' : ''}`;
+                div.innerHTML = `
+                    <div class="hold-label">HELD</div>
+                    ${card.rank}${card.suit}
+                `;
+                div.onclick = () => toggleHold(index);
+                container.appendChild(div);
+            });
+        }
+
+        function toggleHold(index) {
+            if (stage !== 'draw') return;
+            hand[index].held = !hand[index].held;
+            render();
+        }
+
+        function handleAction() {
+            const btn = document.getElementById('action-btn');
+            const msg = document.getElementById('result-text');
+
+            if (stage === 'deal') {
+                createDeck();
+                hand = [];
+                for(let i=0; i<5; i++) hand.push(deck.pop());
+                render();
+                stage = 'draw';
+                btn.innerText = "Draw New Cards";
+                msg.innerText = "Select cards to keep...";
+            } else {
+                // Replace unheld cards
+                for(let i=0; i<5; i++) {
+                    if (!hand[i].held) hand[i] = deck.pop();
+                }
+                // Reset holds for visuals
+                hand.forEach(c => c.held = false); 
+                render();
+                
+                // Evaluate
+                const result = evaluateHand(hand);
+                msg.innerText = result;
+                btn.innerText = "Deal New Hand";
+                stage = 'deal';
+            }
+        }
+
+        function evaluateHand(h) {
+            // Sort by value
+            h.sort((a,b) => a.val - b.val);
+            
+            const counts = {};
+            const suitCounts = {};
+            h.forEach(c => {
+                counts[c.rank] = (counts[c.rank] || 0) + 1;
+                suitCounts[c.suit] = (suitCounts[c.suit] || 0) + 1;
+            });
+
+            const isFlush = Object.keys(suitCounts).length === 1;
+            
+            let isStraight = true;
+            for(let i=0; i<4; i++) {
+                if(h[i+1].val !== h[i].val + 1) {
+                    // Check A-2-3-4-5 special case
+                    if (i===3 && h[4].val===14 && h[0].val===2) continue;
+                    isStraight = false; 
+                    break;
+                }
+            }
+
+            const countVals = Object.values(counts);
+            if (isFlush && isStraight) return "ROYAL/STRAIGHT FLUSH! 🏆";
+            if (countVals.includes(4)) return "Four of a Kind!";
+            if (countVals.includes(3) && countVals.includes(2)) return "Full House!";
+            if (isFlush) return "Flush!";
+            if (isStraight) return "Straight!";
+            if (countVals.includes(3)) return "Three of a Kind";
+            
+            let pairs = 0;
+            countVals.forEach(c => { if(c===2) pairs++; });
+            if (pairs === 2) return "Two Pair";
+            if (pairs === 1) return "Pair"; // Jacks or Better logic can be added here
+
+            return "High Card";
+        }
+        
+        // Init
+        document.getElementById('action-btn').innerText = "Deal Hand";
+    </script>
+</body>
+</html>
