@@ -21,7 +21,7 @@
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-main);
-            overflow-x: hidden;
+            overflow-x: hidden; /* Prevent horizontal scroll from animations */
             background-image: 
                 radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 20%),
                 radial-gradient(circle at 90% 80%, rgba(168, 85, 247, 0.15) 0%, transparent 20%);
@@ -42,7 +42,7 @@
 
         /* --- HERO SECTION --- */
         .hero {
-            height: 90vh;
+            height: 90vh; /* Takes up most of the screen */
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -104,4 +104,192 @@
         
         .project-links a:hover { color: var(--accent-primary); }
 
-        .tags { display: flex; gap:
+        .tags { display: flex; gap: 10px; margin-top: 1.5rem; font-size: 0.8rem; }
+        .tag { color: var(--accent-secondary); font-family: monospace; }
+
+        /* --- BUTTONS --- */
+        .btn-play {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 8px 16px;
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--accent-primary);
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            transition: background 0.3s;
+        }
+        .btn-play:hover { background: rgba(99, 102, 241, 0.2); }
+
+        footer { text-align: center; padding: 4rem 0; color: var(--text-muted); font-size: 0.9rem; }
+
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        
+        /* Mobile adjustment */
+        @media (max-width: 600px) {
+            .hero h1 { font-size: 3rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <section class="hero visible">
+            <p style="color: var(--accent-secondary); font-weight: bold; margin-bottom: 10px;">Hi, my name is</p>
+            <h1>Edgar Zamora.</h1>
+            <div class="subtitle">I am a <span id="typing-text"></span><span class="cursor">&nbsp;</span></div>
+            <p style="max-width: 500px; margin-top: 2rem;">
+                I am a student at UCSD specializing in software development. 
+                I enjoy working with technology, whether it's solving complex logic problems, 
+                troubleshooting hardware, or building game simulations.
+            </p>
+        </section>
+
+        <section id="about">
+            <h2 style="margin-bottom: 2rem; display: flex; align-items: center;">
+                <span style="color: var(--accent-primary); margin-right: 10px;">01.</span> About Me
+            </h2>
+            <div class="card">
+                <p>
+                    Hello! I am currently a student at <strong>UCSD</strong>. 
+                    I enjoy working with technology, whether it's solving complex logic problems or troubleshooting hardware.
+                </p>
+                <p>
+                    When I'm not studying, I enjoy PC gaming (mostly Minecraft) and working on personal tech projects.
+                    Recently, I've been focusing on building simulation engines in Java and Python.
+                </p>
+            </div>
+        </section>
+
+        <section id="projects">
+            <h2 style="margin-bottom: 2rem; display: flex; align-items: center;">
+                <span style="color: var(--accent-primary); margin-right: 10px;">02.</span> Projects
+            </h2>
+            
+            <div class="grid">
+                
+                <div class="card">
+                    <div class="project-header">
+                        <div class="folder-icon">♠️</div>
+                        <div class="project-links">
+                            <a href="https://github.com/Zamora-Edgar" target="_blank">GitHub ↗</a>
+                        </div>
+                    </div>
+                    <h3>Texas Hold'em Bot</h3>
+                    <p>
+                        A complex 2-8 player poker simulation. Features an intelligent betting AI, 
+                        circular table UI rendering using trigonometry, and a 7-card hand evaluation engine.
+                    </p>
+                    <a href="poker.html" class="btn-play">▶ Play Simulation</a>
+                    <div class="tags">
+                        <span class="tag">JavaScript</span>
+                        <span class="tag">AI Logic</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="project-header">
+                        <div class="folder-icon">🃏</div>
+                        <div class="project-links">
+                            <a href="https://github.com/Zamora-Edgar" target="_blank">GitHub ↗</a>
+                        </div>
+                    </div>
+                    
+
+                <div class="card">
+                    <div class="project-header">
+                        <div class="folder-icon">⚡</div>
+                        <div class="project-links">
+                            <a href="https://github.com/Zamora-Edgar/BlackJack-Sim-Java" target="_blank">GitHub ↗</a>
+                        </div>
+                    </div>
+                    <h3>Blackjack Simulator</h3>
+                    <p>
+                        A statistics engine that models card probabilities. 
+                        Includes a playable interface and a "Monte Carlo" simulation that runs 10,000 hands instantly.
+                    </p>
+                    <a href="blackjack.html" class="btn-play">▶ Play / Run Sim</a>
+                    <div class="tags">
+                        <span class="tag">Java</span>
+                        <span class="tag">Stats</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="project-header">
+                        <div class="folder-icon">🎮</div>
+                        <div class="project-links">
+                            <a href="https://github.com/Zamora-Edgar/RPS" target="_blank">GitHub ↗</a>
+                        </div>
+                    </div>
+                    <h3>Rock Paper Scissors</h3>
+                    <p>
+                        A classic game implemented in two ways: a Java console app and a playable web version.
+                        demonstrates game state loops and input validation.
+                    </p>
+                    <a href="rps.html" class="btn-play">▶ Play Game</a>
+                    <div class="tags">
+                        <span class="tag">Java</span>
+                        <span class="tag">Web</span>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Edgar Zamora. Built with HTML & CSS.</p>
+    </footer>
+
+    <script>
+        // 1. TYPING ANIMATION
+        const textElement = document.getElementById('typing-text');
+        const phrases = ["Student.", "Developer.", "Problem Solver.", "Gamer."];
+        let phraseIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+
+        function typeEffect() {
+            const currentPhrase = phrases[phraseIndex];
+            
+            if (isDeleting) {
+                textElement.innerText = currentPhrase.substring(0, charIndex--);
+            } else {
+                textElement.innerText = currentPhrase.substring(0, charIndex++);
+            }
+
+            let typeSpeed = isDeleting ? 50 : 100;
+
+            if (!isDeleting && charIndex === currentPhrase.length) {
+                typeSpeed = 2000; // Pause at end of phrase
+                isDeleting = true;
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                phraseIndex = (phraseIndex + 1) % phrases.length;
+                typeSpeed = 500;
+            }
+
+            setTimeout(typeEffect, typeSpeed);
+        }
+        
+        typeEffect();
+
+        // 2. SCROLL REVEAL ANIMATION
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('section').forEach(section => {
+            observer.observe(section);
+        });
+    </script>
+
+</body>
+</html>
