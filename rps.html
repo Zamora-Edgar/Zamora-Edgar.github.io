@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rock Paper Scissors</title>
+    <style>
+        /* This matches the dark theme of your main portfolio */
+        body {
+            background-color: #0d1117;
+            color: #c9d1d9;
+            font-family: sans-serif;
+            text-align: center;
+            padding-top: 50px;
+        }
+        
+        .game-container {
+            background: #161b22;
+            padding: 2rem;
+            border-radius: 10px;
+            border: 1px solid #30363d;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .btn {
+            background-color: #238636;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 10px;
+            border-radius: 5px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .btn:hover { transform: scale(1.05); background-color: #2ea043; }
+        
+        .result-text { font-size: 1.5rem; margin: 20px 0; font-weight: bold; color: #58a6ff; }
+        .score-board { font-size: 1.1rem; color: #8b949e; margin-top: 20px; border-top: 1px solid #30363d; padding-top: 20px;}
+        
+        .back-link { display: block; margin-top: 30px; color: #58a6ff; text-decoration: none; }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <h1>Rock, Paper, Scissors</h1>
+        <p>Choose your move:</p>
+        
+        <button class="btn" onclick="playGame('rock')">🪨 Rock</button>
+        <button class="btn" onclick="playGame('paper')">📄 Paper</button>
+        <button class="btn" onclick="playGame('scissors')">✂️ Scissors</button>
+
+        <div id="result" class="result-text">Make your move!</div>
+        
+        <div class="score-board">
+            Player: <span id="p-score">0</span> | Computer: <span id="c-score">0</span>
+        </div>
+
+        <a href="index.html" class="back-link">← Back to Portfolio</a>
+    </div>
+
+    <script>
+        // --- JAVASCRIPT LOGIC (The "Brain") ---
+        
+        // 1. Setup Variables (int playerScore = 0;)
+        let playerScore = 0;
+        let computerScore = 0;
+        const options = ["rock", "paper", "scissors"];
+
+        // 2. The Main Function
+        function playGame(playerMove) {
+            
+            // Computer Move (Random random = new Random();)
+            const randomBytes = new Uint32Array(1);
+            window.crypto.getRandomValues(randomBytes);
+            const randomIndex = randomBytes[0] % 3;
+            const computerMove = options[randomIndex];
+
+            // Determine Winner (If/Else Logic)
+            let resultMessage = "";
+
+            if (playerMove === computerMove) {
+                resultMessage = `It's a tie! Both chose ${computerMove}.`;
+            } 
+            else if (
+                (playerMove === "rock" && computerMove === "scissors") ||
+                (playerMove === "paper" && computerMove === "rock") ||
+                (playerMove === "scissors" && computerMove === "paper")
+            ) {
+                resultMessage = `You win! ${playerMove} beats ${computerMove}.`;
+                playerScore++;
+            } else {
+                resultMessage = `Computer wins! ${computerMove} beats ${playerMove}.`;
+                computerScore++;
+            }
+
+            // Update the HTML (System.out.println)
+            document.getElementById("result").innerText = resultMessage;
+            document.getElementById("p-score").innerText = playerScore;
+            document.getElementById("c-score").innerText = computerScore;
+        }
+    </script>
+</body>
+</html>
