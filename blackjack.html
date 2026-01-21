@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blackjack Simulator</title>
+    <style>
+        /* Dark Theme Styles */
+        body {
+            background-color: #0d1117;
+            color: #c9d1d9;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: #161b22;
+            padding: 2rem;
+            border-radius: 10px;
+            border: 1px solid #30363d;
+        }
+
+        h1 { color: #58a6ff; }
+        
+        .card-area {
+            background: #0d1117;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border: 1px solid #30363d;
+            min-height: 50px;
+        }
+
+        .card {
+            display: inline-block;
+            background: white;
+            color: black;
+            padding: 10px 15px;
+            margin: 5px;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .red { color: #d73a49; } /* Hearts/Diamonds */
+        .black { color: #24292e; } /* Spades/Clubs */
+
+        .btn {
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            margin: 5px;
+            color: white;
+        }
+
+        .btn-hit { background-color: #1f6feb; }
+        .btn-stand { background-color: #d73a49; }
+        .btn-new { background-color: #238636; }
+        .btn-sim { background-color: #a371f7; width: 100%; margin-top: 20px;}
+
+        .status { font-size: 1.5rem; font-weight: bold; margin: 15px 0; color: #e3b341; }
+
+        .stats-box {
+            text-align: left;
+            margin-top: 20px;
+            padding: 15px;
+            background: #21262d;
+            border-radius: 5px;
+            display: none; /* Hidden until sim runs */
+        }
+        
+        .back-link { display: block; margin-top: 30px; color: #58a6ff; text-decoration: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>♠️ Blackjack & Stats Engine</h1>
+
+    <div>
+        <h3>Dealer's Hand <span id="dealer-score"></span></h3>
+        <div id="dealer-cards" class="card-area"></div>
+    </div>
+
+    <div>
+        <h3>Your Hand <span id="player-score"></span></h3>
+        <div id="player-cards" class="card-area"></div>
+    </div>
+
+    <div id="status-message" class="status"></div>
+
+    <div id="controls">
+        <button class="btn btn-hit" onclick="hit()">Hit</button>
+        <button class="btn btn-stand" onclick="stand()">Stand</button>
+    </div>
+    
+    <button id="btn-restart" class="btn btn-new" onclick="startNewGame()" style="display:none;">Play Again</button>
+
+    <hr style="border-color: #30363d; margin: 30px 0;">
+
+    <button class="btn btn-sim" onclick="runSimulation()">⚡ Run 10,000 Game Simulation</button>
+    
+    <div id="sim-results" class="stats-box">
+        <h3>Simulation Results (Strategy: Hit < 16)</h3>
+        <p>Wins: <span id="sim-wins">0</span></p>
+        <p>Losses: <span id="sim-losses">0</span></p>
+        <p>Ties: <span id="sim-ties">0</span></p>
+        <p><strong>Win Rate: <span id="sim-rate">0%</span></strong></p>
+    </div>
+
+    <a href="index.html" class="back-link">← Back to Portfolio</a>
+</div>
+
+<script>
+    // --- GAME VARIABLES ---
+    const suits = ['♥', '♦', '♣', '♠'];
+    const values = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
+    let deck = [];
+    let playerHand = [];
+    let dealerHand = [];
+    let gameOver = false;
+
+    // --- GAME LOGIC ---
+
+    function createDeck() {
+        deck = [];
+        for (let suit of suits) {
+            for (let value of values) {
+                deck.push({ suit, value });
+            }
+        }
+        // Shuffle (Fisher-Yates)
+        for (let i = deck.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [deck[i], deck[j]] = [deck[j], deck[i]];
+        }
+    }
+
+    function getCardValue(card) {
+        if (['J','Q','K'].includes(card.value)) return 10;
+        if (card.value === 'A') return 11;
+        return parseInt(card.value);
+    }
+
+    function calculateScore(hand) {
+        let score = 0;
+        let aces = 0;
+        for (let card of hand) {
+            score += getCardValue(card);
+            if (card.value === 'A') aces++;
+        }
+        while (score > 21 && aces > 0) {
+            score -= 10;
+            aces--;
+        }
+        return score;
+    }
+
+    function renderCard(card, elementId) {
+        const div = document.createElement('div');
+        div.className = 'card ' + (['♥','♦'].includes(card.suit) ? 'red' : 'black');
+        div.innerText = card.value + card.suit;
+        document.getElementById(elementId).appendChild(div);
+    }
+
+    function startNewGame() {
+        createDeck();
+        playerHand = [deck.pop(), deck.pop()];
+        dealerHand = [deck.pop(), deck.pop()];
+        gameOver = false;
+        
+        // UI Reset
+        document.getElementById('player-cards').innerHTML = '';
+        document.getElementById('dealer-cards').innerHTML = '';
+        document.getElementById('status-message').innerText = '';
+        document.getElementById('controls').style.display = 'block';
+        document.getElementById('btn-restart').style.display = 'none';
+
+        // Render Player
+        renderCard(playerHand[0], 'player-cards');
+        renderCard(playerHand[1], 'player-cards');
+        document.getElementById('player-score').innerText = `(${calculateScore(playerHand)})`;
+
+        // Render Dealer (Hide 2nd card)
+        renderCard(dealerHand[0], 'dealer-cards');
+        const hiddenCard = document.createElement('div');
+        hiddenCard.className = 'card black';
+        hiddenCard.innerText = '?';
+        hiddenCard.id = 'hidden-card';
+        document.getElementById('dealer-cards').appendChild(hiddenCard);
+        document.getElementById('dealer-score').innerText = "(?)";
+    }
+
+    function hit() {
+        if (gameOver) return;
+        const card = deck.pop();
+        playerHand.push(card);
+        renderCard(card, 'player-cards');
+        
+        const score = calculateScore(playerHand);
+        document.getElementById('player-score').innerText = `(${score})`;
+
+        if (score > 21) {
+            endGame("You Bust! Dealer Wins.");
+        }
+    }
+
+    function stand() {
+        if (gameOver) return;
+        
+        // Reveal Dealer Card
+        document.getElementById('hidden-card').remove();
+        renderCard(dealerHand[1], 'dealer-cards');
+        
+        let dealerScore = calculateScore(dealerHand);
+        
+        // Dealer AI: Hit on anything below 17
+        while (dealerScore < 17) {
+            const card = deck.pop();
+            dealerHand.push(card);
+            renderCard(card, 'dealer-cards');
+            dealerScore = calculateScore(dealerHand);
+        }
+
+        document.getElementById('dealer-score').innerText = `(${dealerScore})`;
+        const playerScore = calculateScore(playerHand);
+
+        // Determine Winner
+        if (dealerScore > 21) endGame("Dealer Busts! You Win!");
+        else if (dealerScore > playerScore) endGame("Dealer Wins.");
+        else if (playerScore > dealerScore) endGame("You Win!");
+        else endGame("Push (Tie).");
+    }
+
+    function endGame(msg) {
+        gameOver = true;
+        document.getElementById('status-message').innerText = msg;
+        document.getElementById('controls').style.display = 'none';
+        document.getElementById('btn-restart').style.display = 'inline-block';
+    }
+
+    // --- SIMULATION LOGIC ---
+    function runSimulation() {
+        let wins = 0, losses = 0, ties = 0;
+        const iterations = 10000;
+
+        for (let i = 0; i < iterations; i++) {
+            createDeck(); // Fresh deck every game
+            let pHand = [deck.pop(), deck.pop()];
+            let dHand = [deck.pop(), deck.pop()];
+
+            // Simple Player AI: Hit if < 16
+            while (calculateScore(pHand) < 16) {
+                pHand.push(deck.pop());
+            }
+
+            let pScore = calculateScore(pHand);
+            let dScore = calculateScore(dHand);
+
+            if (pScore > 21) {
+                losses++;
+            } else {
+                // Dealer plays
+                while (dScore < 17) {
+                    dHand.push(deck.pop());
+                    dScore = calculateScore(dHand);
+                }
+
+                if (dScore > 21) wins++;
+                else if (pScore > dScore) wins++;
+                else if (dScore > pScore) losses++;
+                else ties++;
+            }
+        }
+
+        // Display Results
+        document.getElementById('sim-results').style.display = 'block';
+        document.getElementById('sim-wins').innerText = wins;
+        document.getElementById('sim-losses').innerText = losses;
+        document.getElementById('sim-ties').innerText = ties;
+        document.getElementById('sim-rate').innerText = ((wins / iterations) * 100).toFixed(2) + "%";
+    }
+
+    // Start Game on Load
+    startNewGame();
+
+</script>
+</body>
+</html>
